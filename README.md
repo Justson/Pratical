@@ -109,7 +109,7 @@ public class Person {
 #### 提高可伸缩性
 上面例子可以知道可伸缩最大的威胁就是独占方式的资源锁,所以我们可以通过减少竞争来提升可伸缩性,通过如下方式来减少竞争
 
-1. 缩小锁的范围
+* 缩小锁的范围
 
  ```
  //错误做法
@@ -167,7 +167,7 @@ public class Person {
  
  通过缩小storePassword方法锁的范围,极大的减少了持有锁执行指令数量,根据Amdahl定律,减少串行代码增加并行代码量可以提升可伸缩性.在实际中其实我们可以使用ConcurrentHashMap来代替HashMap达到线程安全,以及代替HashTable提升锁性能,因为ConcurrentHashMap使用了锁分段Segment等技术, 控制粒度都处理的很好.不得不佩服创造ConcurrentHashMap这位大神Doug Lea!
  
-2. 减少锁的粒度(锁分解)
+* 减少锁的粒度(锁分解)
 		
 	```
 		
@@ -208,12 +208,12 @@ public class Person {
 	书本	时候线程会发生竞争, 竞争时候的线程会被挂起, 然后等待, 等待结束被唤醒在加入系统的线
 	程调度队列中,通过锁分解把没必要开销去除
 
-3. 锁分段
+* 锁分段
 
 		参考ConcurrentHashMap.
 		通过Segment把竞争性缩小	
 
-4. 使用共享锁代替独占锁
+* 使用共享锁代替独占锁
 
 	每年春运让人又爱有恨啊,以下模拟下买票系统来说明共享锁和独占锁
 	首先进行简单的说明 , 以下用了JDK提供的共享锁 ReentrantReadWriteLock,
@@ -225,29 +225,29 @@ public class Person {
 
 	独占锁实现的方式如下
 
-	```
-		//@author cenxiaozhong
-		//独占锁方式实现的模拟服务器
-		public class TicketServer {
-		     private static final List<TicketBean> mTicketBeans = new ArrayList<>();
-   			 private static TicketServer mTicketServer = null;
-  			 private Random mRandom = null;
-   			 /**
-    		   * 默认有一万张票
-  			   */
-   				 static {
-     					   for (int i = 0; i < 10000; i++) {
-     					       mTicketBeans.add(new TicketBean(i + 1));
-     						   }
-  					    }
-   				 private TicketServer() {
-    				    mRandom = new Random();
-    				}
-   		 public List<TicketBean> queryTicket() {
+```
+				
+				
+	 public class TicketServer {
+    private static final List<TicketBean> mTicketBeans = new ArrayList<>();
+    private static TicketServer mTicketServer = null;
+    private Random mRandom = null;
+    /**
+     * 默认有一万张票
+     */
+    static {
+        for (int i = 0; i < 10000; i++) {
+            mTicketBeans.add(new TicketBean(i + 1));
+        }
+    }
+    private TicketServer() {
+        mRandom = new Random();
+    }
+    public List<TicketBean> queryTicket() {
         return mTicketBeans;
-  	  }
- 	   public synchronized int queryTicketNumber() {
-        System.out.println(" queryTicketNumber  current size:" + 		mTicketBeans.size() + "   thread:" + Thread.currentThread().getName());
+    }
+    public synchronized int queryTicketNumber() {
+        System.out.println(" queryTicketNumber  current size:" + mTicketBeans.size() + "   thread:" + Thread.currentThread().getName());
         try {
             Thread.sleep(10);//做耗时的logic
         } catch (InterruptedException e) {
@@ -284,17 +284,15 @@ public class Person {
         mTicketBeans.remove(position);//系统移除该票, 改票已经卖出来了
         mTicketBean.setTicketBelong(name);//设置一下票的所属者
         mTicketBean.setTicketKey(Thread.currentThread().getName());
-        System.out.println(" buy  current size:" + mTicketBeans.size() + "   		Thread:" + Thread.currentThread());
+        System.out.println(" buy  current size:" + mTicketBeans.size() + "   Thread:" + Thread.currentThread());
         return mTicketBean;
-   		 }
-		}
+    }
+}
+ 				
+```
+上面独占锁的方式实现卖票模拟器, synchronized的对象是TicketServer, 所以无论是执行买票逻辑还是进行查询剩余的票数的时候内部都只有一个线程在执行,来达到线程安全, 但是这种做法是不提倡,因为这样	做线程的可伸缩性非常死, 提高并发量的时候性能并没有提升.
 
-				
-	```
-	上面独占锁的方式实现卖票模拟器, synchronized的对象是TicketServer, 所以无论是执行买票逻辑	还是
-	进行查询剩余的票数的时候内部都只有一个线程在执行,来达到线程安全, 但是这种做法是不提倡,因为这样	做线程的可伸缩性非常死, 提高并发量的时候性能并没有提升.
-
-	```
+```
 /**
  * 
  * @author cenxiaozhong
@@ -388,15 +386,15 @@ public class TicketServer {
 
 	}
 
-	```
+```
 
-	可以看出查询和买票用了不同锁,共享锁大大提升程序性能. 能避免独占锁尽量避免独占锁
+可以看出查询和买票用了不同锁,共享锁大大提升程序性能. 能避免独占锁尽量避免独占锁
 
 
 
-	以下是模拟客户端
+以下是模拟客户端
 
-	```
+```
 	//@author cenxiaozhong
 public class Clients {
     public static void main(String[] args) {
@@ -462,9 +460,9 @@ public class Clients {
     }
 	}
 
-	```
+```
 
-	####执行结果
+#### 执行结果
 
 		执行环境Mac os 10.12.2,四核 i7 16G运存
 		
@@ -475,10 +473,10 @@ public class Clients {
 		个原因是因为独占锁进行查询的时候会排斥所有线程.
 		
 
+* 在高并发情况不使用对象池(享元模式).享元模式对资源重新利用,用空间换时间, 提高了性能.但是在并发情况反而带来开销.
 
-5. 在高并发情况不使用对象池(享元模式).享元模式对资源重新利用,用空间换时间, 提高了性能.但是在并发情况反而带来开销.
 
-	```
+```
 	 * Return a new Message instance from the global pool. Allows us to
      * avoid allocating new objects in many cases.
      */
@@ -495,10 +493,12 @@ public class Clients {
         }
         return new Message();
     }
-	
-	```
-	以上可以看出从对象池获取对象是必须要加锁,不加锁会出现不同线程拿到相同对象Message,这是不允许的,加锁意味着在多线程访问中会出现阻塞, 阻塞,唤醒等开销足以new 出数百个Message对象了.所以在并发频率很高时候不使用对象池.
-6. 等等.
+```
+
+以上可以看出从对象池获取对象是必须要加锁,不加锁会出现不同线程拿到相同对象Message,这是不允许的,加锁意味着在多线程访问中会出现阻塞, 阻塞,唤醒等开销足以new 出数百个Message对象了.所以在并发频率很高时候不使用对象池.
+
+
+* 等等.
 
 
 
