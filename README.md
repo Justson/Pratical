@@ -1,4 +1,4 @@
-##<center/>Java线程安全与程序性能
+## <center/>Java线程安全与程序性能
 
 ### 定义
 		线程安全:当多个线程访问某个类的时候,不管运行时采用何种调度方式或者这些线程如何交替执行并且在
@@ -172,31 +172,31 @@ public class Person {
 	```
 		
 		public class LockDecomposed {
-	private List<String>books=new ArrayList<String>();
-	private Set<String> mEmployee=new HashSet<>();
-	public void storeBook(String book){
-		/**
-		 * 错误加锁方式
-		 * synchronized (this) {
-		 *	books.add(book);
-		 *}
-		 */
-		synchronized (books) {
+			private List<String>books=new ArrayList<String>();
+			private Set<String> mEmployee=new HashSet<>();
+			public void storeBook(String book){
+			/**
+			 * 错误加锁方式
+			 * synchronized (this) {
+			 *	books.add(book);
+			 *}
+			 */
+			synchronized (books) {
 			books.add(book);
+			}
 		}
+		public void addStaff(String name){
+			/**
+			 *错误加锁方式
+			 * synchronized (this) {
+			 *	mEmployee.add(name);
+			 *}
+			 */
+			synchronized (mEmployee) {
+				mEmployee.add(name);
+			}
+		}	
 	}
-	public void addStaff(String name){
-		/**
-		 *错误加锁方式
-		 * synchronized (this) {
-		 *	mEmployee.add(name);
-		 *}
-		 */
-		synchronized (mEmployee) {
-			mEmployee.add(name);
-		}
-	}	
-}
 
 		
 	```
@@ -204,8 +204,9 @@ public class Person {
 
 		
 
-	以上只是简单例子,可能不符合单一职责原则.如果synchronize(this)锁住的对象为添加员工和储存书本	时候线程会发生竞争, 竞争时候的线程会被挂起, 然后等待, 等待结束被唤醒在加入系统的线程调度队
-	列中,通过锁分解把没必要开销去除
+	以上只是简单例子,可能不符合单一职责原则.如果synchronize(this)锁住的对象为添加员工和储存
+	书本	时候线程会发生竞争, 竞争时候的线程会被挂起, 然后等待, 等待结束被唤醒在加入系统的线
+	程调度队列中,通过锁分解把没必要开销去除
 
 3. 锁分段
 
