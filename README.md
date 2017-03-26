@@ -226,28 +226,28 @@ public class Person {
 	独占锁实现的方式如下
 
 	```
-	//@author cenxiaozhong
-//独占锁方式实现的模拟服务器
-public class TicketServer {
-    private static final List<TicketBean> mTicketBeans = new ArrayList<>();
-    private static TicketServer mTicketServer = null;
-    private Random mRandom = null;
-    /**
-     * 默认有一万张票
-     */
-    static {
-        for (int i = 0; i < 10000; i++) {
-            mTicketBeans.add(new TicketBean(i + 1));
-        }
-    }
-    private TicketServer() {
-        mRandom = new Random();
-    }
-    public List<TicketBean> queryTicket() {
+		//@author cenxiaozhong
+		//独占锁方式实现的模拟服务器
+		public class TicketServer {
+		     private static final List<TicketBean> mTicketBeans = new ArrayList<>();
+   			 private static TicketServer mTicketServer = null;
+  			 private Random mRandom = null;
+   			 /**
+    		   * 默认有一万张票
+  			   */
+   				 static {
+     					   for (int i = 0; i < 10000; i++) {
+     					       mTicketBeans.add(new TicketBean(i + 1));
+     						   }
+  					    }
+   				 private TicketServer() {
+    				    mRandom = new Random();
+    				}
+   		 public List<TicketBean> queryTicket() {
         return mTicketBeans;
-    }
-    public synchronized int queryTicketNumber() {
-        System.out.println(" queryTicketNumber  current size:" + mTicketBeans.size() + "   thread:" + Thread.currentThread().getName());
+  	  }
+ 	   public synchronized int queryTicketNumber() {
+        System.out.println(" queryTicketNumber  current size:" + 		mTicketBeans.size() + "   thread:" + Thread.currentThread().getName());
         try {
             Thread.sleep(10);//做耗时的logic
         } catch (InterruptedException e) {
@@ -284,11 +284,12 @@ public class TicketServer {
         mTicketBeans.remove(position);//系统移除该票, 改票已经卖出来了
         mTicketBean.setTicketBelong(name);//设置一下票的所属者
         mTicketBean.setTicketKey(Thread.currentThread().getName());
-        System.out.println(" buy  current size:" + mTicketBeans.size() + "   Thread:" + Thread.currentThread());
+        System.out.println(" buy  current size:" + mTicketBeans.size() + "   		Thread:" + Thread.currentThread());
         return mTicketBean;
-    }
-}
+   		 }
+		}
 
+				
 	```
 	上面独占锁的方式实现卖票模拟器, synchronized的对象是TicketServer, 所以无论是执行买票逻辑	还是
 	进行查询剩余的票数的时候内部都只有一个线程在执行,来达到线程安全, 但是这种做法是不提倡,因为这样	做线程的可伸缩性非常死, 提高并发量的时候性能并没有提升.
