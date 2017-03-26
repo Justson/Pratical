@@ -1,6 +1,6 @@
 ##<center/>Java线程安全与程序性能
 
-###定义
+### 定义
 		线程安全:当多个线程访问某个类的时候,不管运行时采用何种调度方式或者这些线程如何交替执行并且在
 	这主调代码中不需要任何额外的同步和协同,这个类都能表现出正确的行为, 那么就称这个类为线程安全.
 		
@@ -10,7 +10,7 @@
 	，其它线程处于挂起状。
 	
 	
-###简单说明
+### 简单说明
 线程安全可能是非常复杂的,在没有足够的同步下,多线程执行的顺序是不可预测的,如下在单线程执行时没有任何问题的, 但是多线程执行时可能会出现两个或者多个值一致.
 
 ```
@@ -43,7 +43,7 @@ private AtomicInteger mAtomicInteger=new AtomicInteger();
 ```
 CAS(CompareAndSwap)是一种比较交换,通过循环来保证线程安全的乐观锁.竞争失败的线程并不会被系统挂起, 而是通过自旋(Self-Spin)不断竞争直到成功返回.
 
-###性能
+### 性能
 	主要从可伸缩性,(吞吐率(处理能力)),(服务时间, 延迟时间 (运行速度)) 展开~
 **多线程性能需要建立线程安全基础上, 离开了线程安全线程性能变得没有意义.
 >Amdahl定律 
@@ -106,7 +106,7 @@ public class Person {
 ```
 上面程序简单演示了一个人跑了三圈,这种并行程序设计严重影响程序性能,可伸缩性极低,不如串行程序,当并发数增加的时候计算能力反而下降了.
 
-####提高可伸缩性
+#### 提高可伸缩性
 上面例子可以知道可伸缩最大的威胁就是独占方式的资源锁,所以我们可以通过减少竞争来提升可伸缩性,通过如下方式来减少竞争
 
 1. 缩小锁的范围
@@ -168,9 +168,10 @@ public class Person {
  通过缩小storePassword方法锁的范围,极大的减少了持有锁执行指令数量,根据Amdahl定律,减少串行代码增加并行代码量可以提升可伸缩性.在实际中其实我们可以使用ConcurrentHashMap来代替HashMap达到线程安全,以及代替HashTable提升锁性能,因为ConcurrentHashMap使用了锁分段Segment等技术, 控制粒度都处理的很好.不得不佩服创造ConcurrentHashMap这位大神Doug Lea!
  
 2. 减少锁的粒度(锁分解)
-
+		
 	```
-public class LockDecomposed {
+		
+		public class LockDecomposed {
 	private List<String>books=new ArrayList<String>();
 	private Set<String> mEmployee=new HashSet<>();
 	public void storeBook(String book){
@@ -197,7 +198,11 @@ public class LockDecomposed {
 	}	
 }
 
+		
 	```
+	
+
+		
 
 	以上只是简单例子,可能不符合单一职责原则.如果synchronize(this)锁住的对象为添加员工和储存书本	时候线程会发生竞争, 竞争时候的线程会被挂起, 然后等待, 等待结束被唤醒在加入系统的线程调度队
 	列中,通过锁分解把没必要开销去除
